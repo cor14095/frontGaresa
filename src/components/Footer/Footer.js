@@ -27,7 +27,7 @@ const Footer = (props) => {
         <ul className="nav">
           <li className="nav-item">
             <a className="nav-link" href="https://www.creative-tim.com">
-              Creative Tim
+              Garesa
             </a>
           </li>{" "}
           <li className="nav-item">
@@ -48,7 +48,7 @@ const Footer = (props) => {
           © {new Date().getFullYear()} made with{" "}
           <i className="tim-icons icon-heart-2" /> by{" "}
           <a href="https://www.creative-tim.com/" target="_blank">
-            Creative Tim
+            Garesa
           </a>{" "}
           for a better web.
         </div>
