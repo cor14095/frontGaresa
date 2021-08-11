@@ -4,16 +4,12 @@ import * as types from '../type/sale'
 
 export const fetchSale = ({
   product,
-  client,
-  month,
-  year,
+  client
 }) => ({
   type: types.SALES_FETCHED,
   payload: {
     product,
-    client,
-    month,
-    year,
+    client
   }
 });
 
@@ -32,34 +28,5 @@ export const fetchSaleFail = ({
   type: types.SALES_FETCHED_FAILED,
   payload: {
     message,
-  }
-});
-
-export const fetchSaleForecast = ({
-  product,
-  client,
-}) => ({
-  type: types.SALES_FORECAST_FETCHED,
-  payload: {
-    product,
-    client,
-  }
-});
-
-export const fetchSaleForecastSuccesss = ({
-  forecast
-}) => ({
-  type: types.SALES_FORECAST_FETCHED_SUCCEDDED,
-  payload: {
-    forecast
-  }
-});
-
-export const fetchSaleForecastFail = ({
-  message
-}) => ({
-  type: types.SALES_FORECAST_FETCHED_FAILED,
-  payload: {
-    message
   }
 });

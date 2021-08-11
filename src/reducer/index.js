@@ -14,5 +14,3 @@ export default combineReducers({
 export const getAllSale = (state) => fromSale.getAllSale(state.sale);
 export const getLoading = (state) => fromSale.getLoading(state.sale);
 
-export const getForecastData = (state) => fromSale.getForecastData(state.sale);
-export const getForecastLoading = (state) => fromSale.getForecastLoading(state.sale);

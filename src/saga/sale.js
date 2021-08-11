@@ -14,24 +14,22 @@ function* saleFetcher(action) {
   const {
     payload: {
       product,
-      client,
-      month,
-      year,
+      client
     },
   } = action;
   try {
+
     const { response } = yield call(
       api.fetchSale,
       product,
-      client,
-      month,
-      year,
+      client
     );
-    yield put(
-      actions.fetchSaleSuccess({
+      yield put(actions.fetchSaleSuccess({
         sales: response,
+        
       }),
-    );
+      );
+    
   } catch (error) {
     yield put(actions.fetchSaleFail({
       message: error.message,
@@ -39,39 +37,12 @@ function* saleFetcher(action) {
   }
 }
 
-function* saleForecastFetcher(action) {
-  const {
-    payload: {
-      product,
-      client,
-    },
-  } = action;
-  try {
-    const { response } = yield call(
-      api.fetchSaleForecast,
-      product,
-      client,
-    );
-    yield put(
-      actions.fetchSaleForecastSuccesss({
-        forecast: response,
-      }),
-    );
-  } catch (error) {
-    yield put(actions.fetchSaleForecastFail({
-      message: error.message,
-    }));
-  }
-}
 
 function* SaleSaga() {
+
   yield takeLatest(
     types.SALES_FETCHED,
     saleFetcher,
-  );
-  yield takeLatest(
-    types.SALES_FORECAST_FETCHED,
-    saleForecastFetcher,
   );
 }
 
