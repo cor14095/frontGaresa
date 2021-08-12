@@ -18,7 +18,7 @@ import React from "react";
 // nodejs library that concatenates classes
 //import classNames from "classnames";
 // react plugin used to create charts
-import { Bar } from "react-chartjs-2";
+import { Line  } from "react-chartjs-2";
 // reactstrap components
 import {
   Button,
@@ -42,14 +42,13 @@ import * as actions from '../action/sale';
 import * as selectors from '../reducer';
 import { FadeLoader } from "react-spinners";
 import { css } from "@emotion/react";
+import "react-datetime/css/react-datetime.css";
 
 const override = css`
   display: block;
   margin: 30px -40px auto;
   border-color: red;
 `;
-
-let data;
 
 class Dashboard extends React.Component {
 
@@ -62,13 +61,16 @@ class Dashboard extends React.Component {
 
   componentDidMount() {
     const {
-      fetchSale
+      fetchSale,
     } = this.props;
+    let current_datetime = new Date();
+    //console.log(current_datetime.getFullYear(),current_datetime.getMonth() + 1)
     fetchSale({
       product: '',
-      client: ''
+      client: '',
+      year: current_datetime.getFullYear(),
+      month: current_datetime.getMonth() + 1,
     });
-
   }
 
   FormInput = ({
@@ -86,9 +88,16 @@ class Dashboard extends React.Component {
   )
 
   FormDate = ({
-    input: { onChange },
+    input: {
+      onChange,
+      value
+    },
     placeholder,
-    value,
+    dateFormat,
+    meta: {
+      touched,
+      error
+    }
   }) => (
     <>
       <ReactDatetime
@@ -97,11 +106,14 @@ class Dashboard extends React.Component {
           placeholder,
         }}
         timeFormat={false}
+        dateFormat={dateFormat}
         value={value}
         onChange={value => onChange(value._d)}
         formNoValidate
       />
-      <label className="error">{this.state.error}</label>
+      {(touched && error) && <label className="error">
+        {error}
+      </label>}
     </>
   )
 
@@ -110,92 +122,169 @@ class Dashboard extends React.Component {
       sales,
       loading,
       fetchSale,
-      handleSubmit
-    } = this.props
-    return (
-      data = {
-        data: (canvas) => {
-          let ctx = canvas.getContext("2d");
+      handleSubmit,
+      forecast,
+      forecast_loading,
+    } = this.props;
 
-          let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
-
-          gradientStroke.addColorStop(1, "rgba(72,72,176,0.1)");
-          gradientStroke.addColorStop(0.4, "rgba(72,72,176,0.0)");
-          gradientStroke.addColorStop(0, "rgba(119,52,169,0)"); //purple colors
-
-          return {
-            labels: sales.map((sale) => (
-              sale.fecha_documento
-            )),
-            datasets: [
-              {
-                label: "Ventas",
-                fill: true,
-                backgroundColor: gradientStroke,
-                hoverBackgroundColor: gradientStroke,
-                borderColor: "#d048b6",
-                borderWidth: 2,
-                borderDash: [],
-                borderDashOffset: 0.0,
-                data: sales.map((sale) => (
-                  this.state.type === true ?
-                    sale.venta_neta
-                    :
-                    sale.cantidad_unidad
-                )),
-              },
-            ],
-          };
+    const forecastData = {
+      data: (canvas) => {
+        let ctx = canvas.getContext("2d");
+        let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+        gradientStroke.addColorStop(1, "rgba(72,72,176,0.1)");
+        gradientStroke.addColorStop(0.4, "rgba(72,72,176,0.0)");
+        gradientStroke.addColorStop(0, "rgba(119,52,169,0)");
+        return {
+          labels: ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'],
+          datasets: [
+            {
+              label: "Ventas",
+              fill: true,
+              backgroundColor: gradientStroke,
+              hoverBackgroundColor: gradientStroke,
+              borderColor: "#d048b6",
+              borderWidth: 2,
+              borderDash: [],
+              borderDashOffset: 0.0,
+              data: forecast ? forecast.map(day => (
+                this.state.type === true ?
+                parseFloat(day.venta_neta.toFixed(2)) : 
+                parseFloat(day.cantidad_unidad.toFixed(2))
+              )): [],
+            },
+          ],
+        };
+      },
+      options: {
+        maintainAspectRatio: false,
+        legend: {
+          display: false,
         },
-        options: {
-          maintainAspectRatio: false,
-          legend: {
-            display: false,
-          },
-          tooltips: {
-            backgroundColor: "#f5f5f5",
-            titleFontColor: "#333",
-            bodyFontColor: "#666",
-            bodySpacing: 4,
-            xPadding: 12,
-            mode: "nearest",
-            intersect: 0,
-            position: "nearest",
-          },
-          responsive: true,
-          scales: {
-            yAxes: [
-              {
-                gridLines: {
-                  drawBorder: false,
-                  color: "rgba(225,78,202,0.1)",
-                  zeroLineColor: "transparent",
-                },
-                ticks: {
-                  suggestedMin: 60,
-                  suggestedMax: 120,
-                  padding: 20,
-                  fontColor: "#9e9e9e",
-                },
+        tooltips: {
+          backgroundColor: "#f5f5f5",
+          titleFontColor: "#333",
+          bodyFontColor: "#666",
+          bodySpacing: 4,
+          xPadding: 12,
+          mode: "nearest",
+          intersect: 0,
+          position: "nearest",
+        },
+        responsive: true,
+        scales: {
+          yAxes: [
+            {
+              gridLines: {
+                drawBorder: false,
+                color: "rgba(225,78,202,0.1)",
+                zeroLineColor: "transparent",
               },
-            ],
-            xAxes: [
-              {
-                gridLines: {
-                  drawBorder: false,
-                  color: "rgba(225,78,202,0.1)",
-                  zeroLineColor: "transparent",
-                },
-                ticks: {
-                  padding: 20,
-                  fontColor: "#9e9e9e",
-                },
+              ticks: {
+                suggestedMin: 60,
+                suggestedMax: 120,
+                padding: 20,
+                fontColor: "#9e9e9e",
               },
-            ],
-          },
+            },
+          ],
+          xAxes: [
+            {
+              gridLines: {
+                drawBorder: false,
+                color: "rgba(225,78,202,0.1)",
+                zeroLineColor: "transparent",
+              },
+              ticks: {
+                padding: 20,
+                fontColor: "#9e9e9e",
+              },
+            },
+          ],
         },
       },
+    };
 
+    const data = {
+      data: (canvas) => {
+        let ctx = canvas.getContext("2d");
+        let gradientStroke = ctx.createLinearGradient(0, 230, 0, 50);
+        gradientStroke.addColorStop(1, "rgba(72,72,176,0.1)");
+        gradientStroke.addColorStop(0.4, "rgba(72,72,176,0.0)");
+        gradientStroke.addColorStop(0, "rgba(119,52,169,0)");
+        return {
+          labels: sales.map((sale) => (
+            sale.fecha_documento
+          )),
+          datasets: [
+            {
+              label: "Ventas",
+              fill: true,
+              backgroundColor: gradientStroke,
+              hoverBackgroundColor: gradientStroke,
+              borderColor: "#d048b6",
+              borderWidth: 2,
+              borderDash: [],
+              borderDashOffset: 0.0,
+              data: sales.map((sale) => (
+                this.state.type === true ?
+                  sale.venta_neta
+                  :
+                  sale.cantidad_unidad
+              )),
+            },
+          ],
+        };
+      },
+      options: {
+        maintainAspectRatio: false,
+        legend: {
+          display: false,
+        },
+        tooltips: {
+          backgroundColor: "#f5f5f5",
+          titleFontColor: "#333",
+          bodyFontColor: "#666",
+          bodySpacing: 4,
+          xPadding: 12,
+          mode: "nearest",
+          intersect: 0,
+          position: "nearest",
+        },
+        responsive: true,
+        scales: {
+          yAxes: [
+            {
+              gridLines: {
+                drawBorder: false,
+                color: "rgba(225,78,202,0.1)",
+                zeroLineColor: "transparent",
+              },
+              ticks: {
+                suggestedMin: 60,
+                suggestedMax: 120,
+                padding: 20,
+                fontColor: "#9e9e9e",
+              },
+            },
+          ],
+          xAxes: [
+            {
+              gridLines: {
+                drawBorder: false,
+                color: "rgba(225,78,202,0.1)",
+                zeroLineColor: "transparent",
+              },
+              ticks: {
+                padding: 20,
+                fontColor: "#9e9e9e",
+              },
+            },
+          ],
+        },
+      },
+    }
+
+    return (
       <>
         <div className="content">
           <Row>
@@ -246,10 +335,11 @@ class Dashboard extends React.Component {
                           <FormGroup className={`has-label}`}>
                             <Label>Fecha</Label>
                             <Field
-                              name="dateI"
+                              name="date"
                               component={this.FormDate}
                               type="text"
-                              placeholder="Selecciona la fecha inicial"
+                              placeholder="Selecciona mes/año"
+                              dateFormat='MM/yyyy'
                             />
                           </FormGroup>
                         </Col>
@@ -267,13 +357,40 @@ class Dashboard extends React.Component {
                 <CardBody>
                   <div className="chart-area">
                     {loading === false ?
-                      <Bar
-                        data={data.data}
-                        options={data.options}
-                      />
+                      <>
+                        <Line
+                          data={data.data}
+                          options={data.options}
+                        />
+                      </>
                       :
                       <Col sm="12" md={{ size: 2, offset: 6 }}>
-                        <FadeLoader css={override} size={10} color={"#1d8cf8 "} margin={8} />
+                        <FadeLoader 
+                          css={override} 
+                          size={10} 
+                          color={"#1d8cf8"} 
+                          margin={8} 
+                        />
+                      </Col>
+                    }
+                  </div>
+                  <h2>Prediccion ventas proxima semana</h2>
+                  <div className="chart-area">
+                    {forecast_loading === false && forecast ?
+                      <>
+                        <Line
+                          data={forecastData.data}
+                          options={forecastData.options}
+                        />
+                      </>
+                      :
+                      <Col sm="12" md={{ size: 2, offset: 6 }}>
+                        <FadeLoader 
+                          css={override} 
+                          size={10} 
+                          color={"#1d8cf8"} 
+                          margin={8} 
+                        />
                       </Col>
                     }
                   </div>
@@ -287,7 +404,6 @@ class Dashboard extends React.Component {
   }
 };
 
-
 const ViewDash = reduxForm({
   form: 'sale',
 })(Dashboard);
@@ -296,16 +412,31 @@ export default connect(
   (state) => ({
     sales: selectors.getAllSale(state),
     loading: selectors.getLoading(state),
-
+    forecast: selectors.getForecastData(state),
+    forecast_loading: selectors.getForecastLoading(state),
   }),
   (dispatch) => ({
     fetchSale(values) {
-      console.log(values)
+      let current_datetime = new Date(values.date? values.date : new Date())
+      var month = current_datetime.getMonth() + 1;
+      var year = current_datetime.getFullYear();
       dispatch(actions.fetchSale({
         product: values.product? values.product : '',
-        client: values.client? values.client : ''
+        client: values.client? values.client : '',
+        //date: current_datetime.toLocaleDateString('en-CA'),
+        month,
+        year,
+      }));
+      dispatch(actions.fetchSaleForecast({
+        product: values.product ? values.product : '',
+        client: values.client ? values.client : '',
       }));
     },
-
+    fetchSaleForecast(values){
+      dispatch(actions.fetchSaleForecast({
+        product: values.product ? values.product : '',
+        client: values.client ? values.client : '',
+      }));
+    }
   })
 )(ViewDash);
