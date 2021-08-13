@@ -38,11 +38,15 @@ export const fetchSaleFail = ({
 export const fetchSaleForecast = ({
   product,
   client,
+  year,
+  week,
 }) => ({
   type: types.SALES_FORECAST_FETCHED,
   payload: {
     product,
     client,
+    year,
+    week,
   }
 });
 

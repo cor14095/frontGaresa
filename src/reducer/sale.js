@@ -93,53 +93,6 @@ const forecast = (state=defaultForecast, action) => {
       const {
         forecast
       } = action.payload;
-      /*const dayData = [
-        {
-          venta_neta: 0,
-          cantidad_unidad: 0,
-        },
-        {
-          venta_neta: 0,
-          cantidad_unidad: 0,
-        },
-        {
-          venta_neta: 0,
-          cantidad_unidad: 0,
-        },
-        {
-          venta_neta: 0,
-          cantidad_unidad: 0,
-        },
-        {
-          venta_neta: 0,
-          cantidad_unidad: 0,
-        },
-        {
-          venta_neta: 0,
-          cantidad_unidad: 0,
-        },
-        {
-          venta_neta: 0,
-          cantidad_unidad: 0,
-        }
-      ]
-      forecast.map((y) => {
-        const weekData = y.data;
-        for(var i = 0; i < 7; i++){
-          const dayIdx = i+1;
-          const val = weekData.find(d => d.day === dayIdx);
-          dayData[i].venta_neta += val ? val.venta_neta : 0;
-          dayData[i].cantidad_unidad += val ? val.cantidad_unidad : 0;
-        }
-        return y;
-      })
-      const data_length = dayData.length;
-      const avg_data = dayData.map(info => {
-        return {
-          cantidad_unidad: parseFloat((info.cantidad_unidad/data_length).toFixed(2)),
-          venta_neta: parseFloat((info.venta_neta/data_length).toFixed(2)),
-        }
-      })*/
       return {
         ...state,
         loading: false,

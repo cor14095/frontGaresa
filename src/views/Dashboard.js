@@ -343,6 +343,16 @@ class Dashboard extends React.Component {
                             />
                           </FormGroup>
                         </Col>
+                        <Col md="2">
+                          <FormGroup className={`has-label}`}>
+                            <Label>Week Number</Label>
+                            <Field
+                              name="week"
+                              component={this.FormInput}
+                              type="number"
+                            />
+                          </FormGroup>
+                        </Col>
                         <Col md={{ size: '2' }} style={{ marginTop: 38 }}>
                           <Button color="info"
                             type="submit"
@@ -420,6 +430,7 @@ export default connect(
       let current_datetime = new Date(values.date? values.date : new Date())
       var month = current_datetime.getMonth() + 1;
       var year = current_datetime.getFullYear();
+      console.log(values)
       dispatch(actions.fetchSale({
         product: values.product? values.product : '',
         client: values.client? values.client : '',
@@ -430,6 +441,9 @@ export default connect(
       dispatch(actions.fetchSaleForecast({
         product: values.product ? values.product : '',
         client: values.client ? values.client : '',
+        month,
+        year,
+        week: values.week ? values.week : '',
       }));
     },
     fetchSaleForecast(values){

@@ -44,6 +44,8 @@ function* saleForecastFetcher(action) {
     payload: {
       product,
       client,
+      year,
+      week,
     },
   } = action;
   try {
@@ -51,6 +53,8 @@ function* saleForecastFetcher(action) {
       api.fetchSaleForecast,
       product,
       client,
+      year,
+      week,
     );
     yield put(
       actions.fetchSaleForecastSuccesss({
