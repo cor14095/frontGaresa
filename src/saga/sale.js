@@ -45,6 +45,8 @@ function* saleForecastFetcher(action) {
       product,
       client,
       year,
+      month,
+      day,
       week,
     },
   } = action;
@@ -54,6 +56,8 @@ function* saleForecastFetcher(action) {
       product,
       client,
       year,
+      month,
+      day,
       week,
     );
     yield put(

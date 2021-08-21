@@ -31,7 +31,8 @@ import {
   Input,
   FormGroup,
   Label,
-  CustomInput
+  CustomInput,
+  FormText
 } from "reactstrap";
 
 import { connect } from 'react-redux';
@@ -64,12 +65,10 @@ class Dashboard extends React.Component {
       fetchSale,
     } = this.props;
     let current_datetime = new Date();
-    //console.log(current_datetime.getFullYear(),current_datetime.getMonth() + 1)
     fetchSale({
       product: '',
       client: '',
-      year: current_datetime.getFullYear(),
-      month: current_datetime.getMonth() + 1,
+      date: current_datetime,
     });
   }
 
@@ -87,18 +86,24 @@ class Dashboard extends React.Component {
     </>
   )
 
-  FormDate = ({
-    input: {
-      onChange,
-      value
-    },
-    placeholder,
-    dateFormat,
-    meta: {
-      touched,
-      error
-    }
-  }) => (
+FormDate = ({
+  input: {
+    onChange,
+    value
+  },
+  placeholder,
+  dateFormat,
+  meta: {
+    touched,
+    error
+  }
+}) => {
+  //console.log(value)
+  var currentdate = new Date(value);
+  let onejan = new Date(currentdate.getFullYear(), 0, 1);
+  let week = Math.ceil((((currentdate.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
+  week = week ? week : 0;
+  return (
     <>
       <ReactDatetime
         inputProps={{
@@ -111,11 +116,15 @@ class Dashboard extends React.Component {
         onChange={value => onChange(value._d)}
         formNoValidate
       />
+      <FormText color="muted">
+        {`The week number is ${week}.`}
+      </FormText>
       {(touched && error) && <label className="error">
         {error}
       </label>}
     </>
   )
+}
 
   render() {
     const {
@@ -338,18 +347,8 @@ class Dashboard extends React.Component {
                               name="date"
                               component={this.FormDate}
                               type="text"
-                              placeholder="Selecciona mes/año"
-                              dateFormat='MM/yyyy'
-                            />
-                          </FormGroup>
-                        </Col>
-                        <Col md="2">
-                          <FormGroup className={`has-label}`}>
-                            <Label>Week Number</Label>
-                            <Field
-                              name="week"
-                              component={this.FormInput}
-                              type="number"
+                              placeholder="Selecciona fecha"
+                              dateFormat='DD MMM YYYY'
                             />
                           </FormGroup>
                         </Col>
@@ -427,14 +426,13 @@ export default connect(
   }),
   (dispatch) => ({
     fetchSale(values) {
-      let current_datetime = new Date(values.date? values.date : new Date())
+      let current_datetime = new Date(values.date ? values.date : new Date())
       var month = current_datetime.getMonth() + 1;
       var year = current_datetime.getFullYear();
-      console.log(values)
+      var day = current_datetime.getDate();
       dispatch(actions.fetchSale({
         product: values.product? values.product : '',
         client: values.client? values.client : '',
-        //date: current_datetime.toLocaleDateString('en-CA'),
         month,
         year,
       }));
@@ -443,14 +441,8 @@ export default connect(
         client: values.client ? values.client : '',
         month,
         year,
-        week: values.week ? values.week : '',
+        day,
       }));
     },
-    fetchSaleForecast(values){
-      dispatch(actions.fetchSaleForecast({
-        product: values.product ? values.product : '',
-        client: values.client ? values.client : '',
-      }));
-    }
   })
 )(ViewDash);

@@ -39,6 +39,8 @@ export const fetchSaleForecast = ({
   product,
   client,
   year,
+  month,
+  day,
   week,
 }) => ({
   type: types.SALES_FORECAST_FETCHED,
@@ -46,6 +48,8 @@ export const fetchSaleForecast = ({
     product,
     client,
     year,
+    month,
+    day,
     week,
   }
 });

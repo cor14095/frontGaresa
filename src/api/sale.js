@@ -42,16 +42,22 @@ export const fetchSaleForecast = (
   product,
   client,
   year,
+  month,
+  day,
   week,
 ) => new Promise((resolve, reject) => {
   const cliente = client ? `client=${client}` : '';
   const producto = product ? `product=${product}` : '';
   const _year = year ? `year=${year}` : '';
+  const _month = month ? `month=${month}` : '';
+  const _day = day ? `day=${day}` : '';
   const _week = week ? `week=${week}` : '';
   const arrParams = [
     cliente,
     producto,
     _year,
+    _month,
+    _day,
     _week,
   ];
   const urlParams = arrParams.filter(a => a!=='').join("&");
